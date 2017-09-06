@@ -19,6 +19,7 @@ test_index = np.load('output/test_index.npy')
 
 X_train, X_val, Y_train, Y_val = train_test_split(X_train_orig, Y_train_orig, test_size=0.20, random_state=42)
 X_train, X_val, Y_train, Y_val = X_train.T, X_val.T, Y_train.T, Y_val.T
+X_test = X_test.T
 print(X_train.shape, X_val.shape, Y_train.shape, Y_val.shape)
 
 
@@ -176,7 +177,7 @@ def random_mini_batches(X, Y, mini_batch_size=32, seed=0):
 
 
 def predict(X, parameters):
-    W1 = tf.convert_to_tensor(parameters["W1"])
+    W1 = tf.convert_to_tensor(parameters['W1'])
     b1 = tf.convert_to_tensor(parameters["b1"])
     W2 = tf.convert_to_tensor(parameters["W2"])
     b2 = tf.convert_to_tensor(parameters["b2"])
@@ -194,7 +195,7 @@ def predict(X, parameters):
               "W4": W4,
               "b4": b4}
 
-    x = tf.placeholder("float", [350, None])
+    x = tf.placeholder("float", [X_train.shape[0], None])
     keep_prob = tf.placeholder(tf.float32, name='keep_prob')
 
     z4 = forward_propagation(x, params, keep_prob)
@@ -207,7 +208,7 @@ def predict(X, parameters):
 
 
 def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
-          num_epochs=700, minibatch_size=32, print_cost=True):
+          num_epochs=1000, minibatch_size=32, print_cost=True):
     """
     Implements a four-layer tensorflow neural network: LINEAR->RELU->LINEAR->RELU->LINEAR->SOFTMAX.
 
@@ -308,12 +309,12 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
 
 
 parameters = model(X_train, Y_train, X_val, Y_val)
-np.save('output/parameters.npy', parameters)
+#np.save('output/parameters.npy', parameters)
+#parameters = np.load('output/parameters.npy')
 
 prediction = predict(X_test, parameters)
-np.save('output/prediction.npy', prediction)
 
-submission = pd.DataFrame(prediction)
+submission = pd.DataFrame(pd.get_dummies(prediction))
 submission['id'] = test_index
 submission.columns = ['class1', 'class2', 'class3', 'class4', 'class5', 'class6', 'class7', 'class8', 'class9', 'id']
 submission.to_csv("output/submission_all.csv",index=False)
