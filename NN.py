@@ -152,11 +152,11 @@ def compute_cost_multiclasslogloss(Z4, Y):
 
     #logits = tf.maximum(tf.minimum(logits, 1 - 1e-15), 1e-15)
 
-    # cost = tf.losses.log_loss(tf.transpose(Y), tf.transpose(Z4), reduction=tf.losses.Reduction.MEAN)
+    cost = tf.losses.log_loss(labels, logits, reduction=tf.losses.Reduction.MEAN)
     # cost = -tf.reduce_mean(
     # ((labels * tf.log(logits)) + ((1 - labels) * tf.log(1 - logits))),
     # name='multiclasslogloss')
-    cost = tf.reduce_sum(tf.multiply(-labels, tf.log(logits))) / len(logits)
+    # cost = tf.reduce_sum(tf.multiply(-labels, tf.log(logits))) / len(logits)
 
     return cost
 
