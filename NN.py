@@ -4,6 +4,7 @@ import h5py
 import matplotlib.pyplot as plt
 import pandas as pd
 import tensorflow as tf
+import time
 
 from tensorflow.python.framework import ops
 from sklearn.model_selection import train_test_split
@@ -15,7 +16,7 @@ X_train_orig = np.load('output/train_set.npy')
 Y_train_orig = np.load('output/encoded_y.npy')
 X_test = np.load('output/test_set.npy')
 test_index = np.load('output/test_index.npy')
-
+timestr = time.strftime("%Y%m%d-%H%M%S")
 
 X_train, X_val, Y_train, Y_val = train_test_split(X_train_orig, Y_train_orig, test_size=0.20, random_state=42)
 X_train, X_val, Y_train, Y_val = X_train.T, X_val.T, Y_train.T, Y_val.T
@@ -133,6 +134,31 @@ def compute_cost(Z4, Y):
 
     return cost
 
+def compute_cost_multiclasslogloss(Z4, Y):
+    """
+    Computes the cost
+
+    Arguments:
+    Z4 -- output of forward propagation (output of the last LINEAR unit), of shape (6, number of examples)
+    Y -- "true" labels vector placeholder, same shape as Z3
+
+    Returns:
+    cost - Tensor of the cost function
+    """
+
+    # to fit the tensorflow requirement for tf.nn.softmax_cross_entropy_with_logits(...,...)
+    logits = tf.transpose(Z4)
+    labels = tf.transpose(Y)
+
+    #logits = tf.maximum(tf.minimum(logits, 1 - 1e-15), 1e-15)
+
+    # cost = tf.losses.log_loss(tf.transpose(Y), tf.transpose(Z4), reduction=tf.losses.Reduction.MEAN)
+    # cost = -tf.reduce_mean(
+    # ((labels * tf.log(logits)) + ((1 - labels) * tf.log(1 - logits))),
+    # name='multiclasslogloss')
+    cost = tf.reduce_sum(tf.multiply(-labels, tf.log(logits))) / len(logits)
+
+    return cost
 
 def random_mini_batches(X, Y, mini_batch_size=32, seed=0):
     """
@@ -199,7 +225,8 @@ def predict(X, parameters):
     keep_prob = tf.placeholder(tf.float32, name='keep_prob')
 
     z4 = forward_propagation(x, params, keep_prob)
-    p = tf.argmax(z4)
+    p = tf.nn.softmax(z4)
+    # p = tf.argmax(z4) # this gives only the predicted class as output
 
     sess = tf.Session()
     prediction = sess.run(p, feed_dict={x: X, keep_prob:1.0})
@@ -232,6 +259,7 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
     (n_x, m) = X_train.shape  # (n_x: input size, m : number of examples in the train set)
     n_y = Y_train.shape[0]  # n_y : output size
     costs = []  # To keep track of the cost
+    t0 = time.time()
 
     # Create Placeholders of shape (n_x, n_y)
     X, Y = create_placeholders(n_x, n_y)
@@ -245,6 +273,8 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
 
     # Cost function: Add cost function to tensorflow graph
     cost = compute_cost(Z4, Y)
+    # cost = tf.losses.softmax_cross_entropy(tf.transpose(Y), tf.transpose(Z4))
+    # cost = compute_cost_multiclasslogloss(Z4, Y)
 
     # Backpropagation: Define the tensorflow optimizer. Use an AdamOptimizer.
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
@@ -288,9 +318,9 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
         # plot the cost
         plt.plot(np.squeeze(costs))
         plt.ylabel('cost')
-        plt.xlabel('iterations (per tens)')
+        plt.xlabel('iterations (per fives)')
         plt.title("Learning rate =" + str(learning_rate))
-        plt.savefig('output/learning_rate_' + str(learning_rate) + '.png')
+        plt.savefig('output/learning_rate_' + str(learning_rate) + '_' + timestr + '.png')
 
         # lets save the parameters in a variable
         parameters = sess.run(parameters)
@@ -302,6 +332,7 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
         # Calculate accuracy on the test set
         accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
 
+        print('Finished training in %s s' % (time.time() - t0))
         print("Train Accuracy:", accuracy.eval({X: X_train, Y: Y_train, keep_prob: 1.0}))
         print("Test Accuracy:", accuracy.eval({X: X_test, Y: Y_test, keep_prob: 1.0}))
 
@@ -313,8 +344,9 @@ parameters = model(X_train, Y_train, X_val, Y_val)
 #parameters = np.load('output/parameters.npy')
 
 prediction = predict(X_test, parameters)
-
-submission = pd.DataFrame(pd.get_dummies(prediction))
+print(prediction.shape)
+submission = pd.DataFrame(prediction.T)
+print(submission.shape)
 submission['id'] = test_index
 submission.columns = ['class1', 'class2', 'class3', 'class4', 'class5', 'class6', 'class7', 'class8', 'class9', 'id']
-submission.to_csv("output/submission_all.csv",index=False)
+submission.to_csv("output/submission" + '_' + timestr + '.csv', index=False)
