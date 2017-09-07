@@ -225,7 +225,7 @@ def predict(X, parameters):
     keep_prob = tf.placeholder(tf.float32, name='keep_prob')
 
     z4 = forward_propagation(x, params, keep_prob)
-    p = tf.nn.softmax(z4)
+    p = tf.nn.softmax(z4, dim=0) # dim=0 because the classes are on that axis
     # p = tf.argmax(z4) # this gives only the predicted class as output
 
     sess = tf.Session()
