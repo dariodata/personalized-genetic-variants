@@ -78,7 +78,7 @@ def initialize_parameters():
     return parameters
 
 
-def forward_propagation(X, parameters, keep_prob):
+def forward_propagation(X, parameters, keep_prob1, keep_prob2):
     """
     Implements the forward propagation for the model: LINEAR -> RELU -> LINEAR -> RELU -> LINEAR -> SOFTMAX
 
@@ -103,10 +103,10 @@ def forward_propagation(X, parameters, keep_prob):
 
     Z1 = tf.matmul(W1, X) + b1  # Z1 = np.dot(W1, X) + b1
     A1 = tf.nn.relu(Z1)  # A1 = relu(Z1)
-    A1 = tf.nn.dropout(A1, keep_prob)
+    A1 = tf.nn.dropout(A1, keep_prob1)
     Z2 = tf.matmul(W2, A1) + b2  # Z2 = np.dot(W2, a1) + b2
     A2 = tf.nn.relu(Z2)  # A2 = relu(Z2)
-    A2 = tf.nn.dropout(A2, keep_prob)
+    A2 = tf.nn.dropout(A2, keep_prob2)
     Z3 = tf.matmul(W3, A2) + b3  # Z3 = np.dot(W3,Z2) + b3
     A3 = tf.nn.relu(Z3)
     Z4 = tf.matmul(W4, A3) + b4
@@ -222,14 +222,15 @@ def predict(X, parameters):
               "b4": b4}
 
     x = tf.placeholder("float", [X_train.shape[0], None])
-    keep_prob = tf.placeholder(tf.float32, name='keep_prob')
+    keep_prob1 = tf.placeholder(tf.float32, name='keep_prob1')
+    keep_prob2 = tf.placeholder(tf.float32, name='keep_prob2')
 
-    z4 = forward_propagation(x, params, keep_prob)
+    z4 = forward_propagation(x, params, keep_prob1, keep_prob2)
     p = tf.nn.softmax(z4, dim=0) # dim=0 because the classes are on that axis
     # p = tf.argmax(z4) # this gives only the predicted class as output
 
     sess = tf.Session()
-    prediction = sess.run(p, feed_dict={x: X, keep_prob:1.0})
+    prediction = sess.run(p, feed_dict={x: X, keep_prob1:1.0, keep_prob2:1.0})
 
     return prediction
 
@@ -263,13 +264,14 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
 
     # Create Placeholders of shape (n_x, n_y)
     X, Y = create_placeholders(n_x, n_y)
-    keep_prob = tf.placeholder(tf.float32, name='keep_prob')
+    keep_prob1 = tf.placeholder(tf.float32, name='keep_prob1')
+    keep_prob2 = tf.placeholder(tf.float32, name='keep_prob2')
 
     # Initialize parameters
     parameters = initialize_parameters()
 
     # Forward propagation: Build the forward propagation in the tensorflow graph
-    Z4 = forward_propagation(X, parameters, keep_prob)
+    Z4 = forward_propagation(X, parameters, keep_prob1, keep_prob2)
 
     # Cost function: Add cost function to tensorflow graph
     cost = compute_cost(Z4, Y)
@@ -303,7 +305,7 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
                 # IMPORTANT: The line that runs the graph on a minibatch.
                 # Run the session to execute the "optimizer" and the "cost", the feedict should contain a minibatch for (X,Y).
                 _, minibatch_cost = sess.run([optimizer, cost], feed_dict={X: minibatch_X, Y: minibatch_Y,
-                                                                           keep_prob: 0.6})
+                                                                           keep_prob1: 0.7, keep_prob2: 0.5})
                 epoch_cost += minibatch_cost / num_minibatches
 
             # Print the cost every epoch
@@ -330,8 +332,8 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
         accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
 
         print('Finished training in %s s' % (time.time() - t0))
-        print("Train Accuracy:", accuracy.eval({X: X_train, Y: Y_train, keep_prob: 1.0}))
-        print("Test Accuracy:", accuracy.eval({X: X_test, Y: Y_test, keep_prob: 1.0}))
+        print("Train Accuracy:", accuracy.eval({X: X_train, Y: Y_train, keep_prob1:1.0, keep_prob2:1.0}))
+        print("Test Accuracy:", accuracy.eval({X: X_test, Y: Y_test, keep_prob1:1.0, keep_prob2:1.0}))
 
         return parameters
 
