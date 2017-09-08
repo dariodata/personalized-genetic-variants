@@ -236,7 +236,7 @@ def predict(X, parameters):
 
 
 def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
-          num_epochs=1000, minibatch_size=32, print_cost=True):
+          num_epochs=1000, minibatch_size=64, print_cost=True):
     """
     Implements a four-layer tensorflow neural network: LINEAR->RELU->LINEAR->RELU->LINEAR->SOFTMAX.
 
@@ -275,7 +275,6 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
 
     # Cost function: Add cost function to tensorflow graph
     cost = compute_cost(Z4, Y)
-    # cost = tf.losses.softmax_cross_entropy(tf.transpose(Y), tf.transpose(Z4))
     # cost = compute_cost_multiclasslogloss(Z4, Y)
 
     # Backpropagation: Define the tensorflow optimizer. Use an AdamOptimizer.
@@ -339,8 +338,6 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
 
 
 parameters = model(X_train, Y_train, X_val, Y_val)
-#np.save('output/parameters.npy', parameters)
-#parameters = np.load('output/parameters.npy')
 
 prediction = predict(X_test, parameters)
 print(prediction.shape)
