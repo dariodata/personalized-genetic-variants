@@ -57,13 +57,13 @@ def initialize_parameters():
 
     tf.set_random_seed(1)
 
-    W1 = tf.get_variable('W1', [256, X_train.shape[0]], initializer=tf.contrib.layers.xavier_initializer(seed=1))
-    b1 = tf.get_variable('b1', [256, 1], initializer=tf.zeros_initializer())
-    W2 = tf.get_variable('W2', [256, 256], initializer=tf.contrib.layers.xavier_initializer(seed=1))
-    b2 = tf.get_variable('b2', [256, 1], initializer=tf.zeros_initializer())
-    W3 = tf.get_variable('W3', [80, 256], initializer=tf.contrib.layers.xavier_initializer(seed=1))
-    b3 = tf.get_variable('b3', [80, 1], initializer=tf.zeros_initializer())
-    W4 = tf.get_variable('W4', [9, 80], initializer=tf.contrib.layers.xavier_initializer(seed=1))
+    W1 = tf.get_variable('W1', [350, X_train.shape[0]], initializer=tf.contrib.layers.xavier_initializer(seed=1))
+    b1 = tf.get_variable('b1', [350, 1], initializer=tf.zeros_initializer())
+    W2 = tf.get_variable('W2', [350, 350], initializer=tf.contrib.layers.xavier_initializer(seed=1))
+    b2 = tf.get_variable('b2', [350, 1], initializer=tf.zeros_initializer())
+    W3 = tf.get_variable('W3', [100, 350], initializer=tf.contrib.layers.xavier_initializer(seed=1))
+    b3 = tf.get_variable('b3', [100, 1], initializer=tf.zeros_initializer())
+    W4 = tf.get_variable('W4', [9, 100], initializer=tf.contrib.layers.xavier_initializer(seed=1))
     b4 = tf.get_variable('b4', [9, 1], initializer=tf.zeros_initializer())
 
     parameters = {"W1": W1,
