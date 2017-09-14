@@ -346,9 +346,7 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
 parameters = model(X_train, Y_train, X_val, Y_val)
 
 prediction = predict(X_test, parameters)
-print(prediction.shape)
 submission = pd.DataFrame(prediction.T)
-print(submission.shape)
 submission['id'] = test_index
 submission.columns = ['class1', 'class2', 'class3', 'class4', 'class5', 'class6', 'class7', 'class8', 'class9', 'id']
 submission.to_csv('output/' + timestr + '_submission.csv', index=False)
