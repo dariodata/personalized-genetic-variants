@@ -317,12 +317,6 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
             if print_cost == True and epoch % 5 == 0:
                 costs.append(epoch_cost)
 
-        # plot the cost
-        plt.plot(np.squeeze(costs))
-        plt.ylabel('cost')
-        plt.xlabel('iterations (per fives)')
-        plt.title("Learning rate =" + str(learning_rate))
-        plt.savefig('output/learning_rate_' + str(learning_rate) + '_' + timestr + '.png')
 
         # lets save the parameters in a variable
         parameters = sess.run(parameters)
@@ -330,13 +324,32 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
 
         # Calculate the correct predictions
         correct_prediction = tf.equal(tf.argmax(Z4), tf.argmax(Y))
-
         # Calculate accuracy on the test set
         accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
 
+        train_cost = cost.eval({X: X_train, Y: Y_train, keep_prob1:1.0, keep_prob2:1.0})
+        test_cost = cost.eval({X: X_test, Y: Y_test, keep_prob1:1.0, keep_prob2:1.0})
+        train_accuracy = accuracy.eval({X: X_train, Y: Y_train, keep_prob1:1.0, keep_prob2:1.0})
+        test_accuracy = accuracy.eval({X: X_test, Y: Y_test, keep_prob1:1.0, keep_prob2:1.0})
+
         print('Finished training in %s s' % (time.time() - t0))
-        print("Train Accuracy:", accuracy.eval({X: X_train, Y: Y_train, keep_prob1:1.0, keep_prob2:1.0}))
-        print("Test Accuracy:", accuracy.eval({X: X_test, Y: Y_test, keep_prob1:1.0, keep_prob2:1.0}))
+        print("Train Cost:", train_cost)
+        print("Test Cost:", test_cost)
+        print("Train Accuracy:", train_accuracy)
+        print("Test Accuracy:", test_accuracy)
+
+        # plot the cost
+        plt.plot(np.squeeze(costs))
+        plt.ylabel('cost')
+        plt.xlabel('iterations (per fives)')
+        plt.title("Learning rate = {0}, beta = {1}, test cost = {2}, test accuracy = {3}".format(str(learning_rate),
+                                                                                                 str(beta),
+                                                                                                 str(test_cost),
+                                                                                                 str(test_accuracy)))
+        dirname = 'output/'
+        filename = timestr + '_lr_' + str(learning_rate) + '_beta_' + str(beta) \
+                   + '_testcost_' + str(test_cost) + '_accuracy_' + str(test_accuracy) + '.png'
+        plt.savefig(dirname + filename)
 
         return parameters
 
@@ -349,4 +362,4 @@ submission = pd.DataFrame(prediction.T)
 print(submission.shape)
 submission['id'] = test_index
 submission.columns = ['class1', 'class2', 'class3', 'class4', 'class5', 'class6', 'class7', 'class8', 'class9', 'id']
-submission.to_csv("output/submission" + '_' + timestr + '.csv', index=False)
+submission.to_csv('output/' + timestr + '_submission.csv', index=False)
