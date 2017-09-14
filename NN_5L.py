@@ -145,31 +145,6 @@ def compute_cost(ZL, Y):
 
     return cost
 
-def compute_cost_multiclasslogloss(ZL, Y):
-    """
-    Computes the cost
-
-    Arguments:
-    ZL -- output of forward propagation (output of the last LINEAR unit), of shape (6, number of examples)
-    Y -- "true" labels vector placeholder, same shape as Z3
-
-    Returns:
-    cost - Tensor of the cost function
-    """
-
-    # to fit the tensorflow requirement for tf.nn.softmax_cross_entropy_with_logits(...,...)
-    logits = tf.transpose(ZL)
-    labels = tf.transpose(Y)
-
-    #logits = tf.maximum(tf.minimum(logits, 1 - 1e-15), 1e-15)
-
-    cost = tf.losses.log_loss(labels, logits, reduction=tf.losses.Reduction.MEAN)
-    # cost = -tf.reduce_mean(
-    # ((labels * tf.log(logits)) + ((1 - labels) * tf.log(1 - logits))),
-    # name='multiclasslogloss')
-    # cost = tf.reduce_sum(tf.multiply(-labels, tf.log(logits))) / len(logits)
-
-    return cost
 
 def random_mini_batches(X, Y, mini_batch_size=32, seed=0):
     """
