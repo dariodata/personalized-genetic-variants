@@ -288,6 +288,10 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
     # Cost function: Add cost function to tensorflow graph
     cost = compute_cost(ZL, Y)
     # cost = compute_cost_multiclasslogloss(ZL, Y)
+    regularizers = tf.nn.l2_loss(parameters['W1']) + tf.nn.l2_loss(parameters['W2']) + tf.nn.l2_loss(parameters['W3']) \
+                   + tf.nn.l2_loss(parameters['W4']) # add regularization term
+    beta = 0.05 # regularization constant
+    cost = tf.reduce_mean(cost + beta*regularizers) # cost with regularization
 
     # Backpropagation: Define the tensorflow optimizer. Use an AdamOptimizer.
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
@@ -325,12 +329,6 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
             if print_cost == True and epoch % 5 == 0:
                 costs.append(epoch_cost)
 
-        # plot the cost
-        plt.plot(np.squeeze(costs))
-        plt.ylabel('cost')
-        plt.xlabel('iterations (per fives)')
-        plt.title("Learning rate =" + str(learning_rate))
-        plt.savefig('output/learning_rate_' + str(learning_rate) + '_' + timestr + '.png')
 
         # lets save the parameters in a variable
         parameters = sess.run(parameters)
@@ -342,9 +340,27 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
         # Calculate accuracy on the test set
         accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
 
+        train_cost = cost.eval({X: X_train, Y: Y_train, keep_prob1:1.0, keep_prob2:1.0})
+        test_cost = cost.eval({X: X_test, Y: Y_test, keep_prob1:1.0, keep_prob2:1.0})
+        train_accuracy = accuracy.eval({X: X_train, Y: Y_train, keep_prob1:1.0, keep_prob2:1.0})
+        test_accuracy = accuracy.eval({X: X_test, Y: Y_test, keep_prob1:1.0, keep_prob2:1.0})
+
         print('Finished training in %s s' % (time.time() - t0))
-        print("Train Accuracy:", accuracy.eval({X: X_train, Y: Y_train, keep_prob1:1.0, keep_prob2:1.0}))
-        print("Test Accuracy:", accuracy.eval({X: X_test, Y: Y_test, keep_prob1:1.0, keep_prob2:1.0}))
+        print("Train Cost:", train_cost)
+        print("Test Cost:", test_cost)
+        print("Train Accuracy:", train_accuracy)
+        print("Test Accuracy:", test_accuracy)
+
+        # plot the cost
+        plt.plot(np.squeeze(costs))
+        plt.ylabel('cost')
+        plt.xlabel('iterations (per fives)')
+        plt.title("Learning rate = {}, beta = {},\n"
+                  "test cost = {:.6f}, test accuracy = {:.6f}".format(learning_rate, beta, test_cost, test_accuracy))
+        dirname = 'output/'
+        filename = timestr + '_lr_{}_beta_{}_testcost_{:.2f}_testacc_{:.2f}.png'.format(learning_rate, beta,
+                                                                                        test_cost, test_accuracy)
+        plt.savefig(dirname + filename)
 
         return parameters
 
@@ -357,4 +373,4 @@ submission = pd.DataFrame(prediction.T)
 print(submission.shape)
 submission['id'] = test_index
 submission.columns = ['class1', 'class2', 'class3', 'class4', 'class5', 'class6', 'class7', 'class8', 'class9', 'id']
-submission.to_csv("output/submission" + '_' + timestr + '.csv', index=False)
+submission.to_csv('output/' + timestr + '_submission.csv', index=False)
