@@ -343,7 +343,7 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
         plt.ylabel('cost')
         plt.xlabel('iterations (per fives)')
         plt.title("Learning rate = {}, beta = {},\n"
-                  "test cost = {}, test accuracy = {}".format(learning_rate, beta, test_cost, test_accuracy))
+                  "test cost = {:.6f}, test accuracy = {:.6f}".format(learning_rate, beta, test_cost, test_accuracy))
         dirname = 'output/'
         filename = timestr + '_lr_{}_beta_{}_testcost_{:.2f}_testacc_{:.2f}.png'.format(learning_rate, beta,
                                                                                         test_cost, test_accuracy)
