@@ -277,9 +277,9 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
     cost = compute_cost(Z4, Y)
     # cost = compute_cost_multiclasslogloss(Z4, Y)
     regularizers = tf.nn.l2_loss(parameters['W1']) + tf.nn.l2_loss(parameters['W2']) + tf.nn.l2_loss(parameters['W3']) \
-                   + tf.nn.l2_loss(parameters['W4'])
-    beta = 0.001
-    cost = tf.reduce_mean(cost + beta*regularizers)
+                   + tf.nn.l2_loss(parameters['W4']) # add regularization term
+    beta = 0.001 # regularization constant
+    cost = tf.reduce_mean(cost + beta*regularizers) # cost with regularization
 
     # Backpropagation: Define the tensorflow optimizer. Use an AdamOptimizer.
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
