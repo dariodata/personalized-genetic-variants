@@ -21,7 +21,10 @@ timestr = time.strftime("%Y%m%d-%H%M%S")
 X_train, X_val, Y_train, Y_val = train_test_split(X_train_orig, Y_train_orig, test_size=0.20, random_state=42)
 X_train, X_val, Y_train, Y_val = X_train.T, X_val.T, Y_train.T, Y_val.T
 X_test = X_test.T
-print(X_train.shape, X_val.shape, Y_train.shape, Y_val.shape)
+print('X_train: ', X_train.shape)
+print('X_val: ', X_val.shape)
+print('Y_train: ', Y_train.shape)
+print('Y_val: ', Y_val.shape)
 
 
 def create_placeholders(n_x, n_y):
@@ -134,31 +137,6 @@ def compute_cost(Z4, Y):
 
     return cost
 
-def compute_cost_multiclasslogloss(Z4, Y):
-    """
-    Computes the cost
-
-    Arguments:
-    Z4 -- output of forward propagation (output of the last LINEAR unit), of shape (6, number of examples)
-    Y -- "true" labels vector placeholder, same shape as Z3
-
-    Returns:
-    cost - Tensor of the cost function
-    """
-
-    # to fit the tensorflow requirement for tf.nn.softmax_cross_entropy_with_logits(...,...)
-    logits = tf.transpose(Z4)
-    labels = tf.transpose(Y)
-
-    #logits = tf.maximum(tf.minimum(logits, 1 - 1e-15), 1e-15)
-
-    cost = tf.losses.log_loss(labels, logits, reduction=tf.losses.Reduction.MEAN)
-    # cost = -tf.reduce_mean(
-    # ((labels * tf.log(logits)) + ((1 - labels) * tf.log(1 - logits))),
-    # name='multiclasslogloss')
-    # cost = tf.reduce_sum(tf.multiply(-labels, tf.log(logits))) / len(logits)
-
-    return cost
 
 def random_mini_batches(X, Y, mini_batch_size=32, seed=0):
     """
@@ -355,9 +333,7 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
 parameters = model(X_train, Y_train, X_val, Y_val)
 
 prediction = predict(X_test, parameters)
-print(prediction.shape)
 submission = pd.DataFrame(prediction.T)
-print(submission.shape)
 submission['id'] = test_index
 submission.columns = ['class1', 'class2', 'class3', 'class4', 'class5', 'class6', 'class7', 'class8', 'class9', 'id']
 submission.to_csv('output/' + timestr + '_submission.csv', index=False)
