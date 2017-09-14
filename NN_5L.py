@@ -248,7 +248,7 @@ def predict(X, parameters):
 
 
 def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
-          num_epochs=1000, minibatch_size=64, print_cost=True):
+          num_epochs=2000, minibatch_size=64, print_cost=True):
     """
     Implements a four-layer tensorflow neural network: LINEAR->RELU->LINEAR->RELU->LINEAR->SOFTMAX.
 
@@ -290,7 +290,7 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
     # cost = compute_cost_multiclasslogloss(ZL, Y)
     regularizers = tf.nn.l2_loss(parameters['W1']) + tf.nn.l2_loss(parameters['W2']) + tf.nn.l2_loss(parameters['W3']) \
                    + tf.nn.l2_loss(parameters['W4']) # add regularization term
-    beta = 0.05 # regularization constant
+    beta = 0.1 # regularization constant
     cost = tf.reduce_mean(cost + beta*regularizers) # cost with regularization
 
     # Backpropagation: Define the tensorflow optimizer. Use an AdamOptimizer.
@@ -318,7 +318,7 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
                 (minibatch_X, minibatch_Y) = minibatch
 
                 # IMPORTANT: The line that runs the graph on a minibatch.
-                # Run the session to execute the "optimizer" and the "cost", the feedict should contain a minibatch for (X,Y).
+                # Run the session to execute the "optimizer" and the "cost"
                 _, minibatch_cost = sess.run([optimizer, cost], feed_dict={X: minibatch_X, Y: minibatch_Y,
                                                                            keep_prob1: 0.7, keep_prob2: 0.5})
                 epoch_cost += minibatch_cost / num_minibatches
