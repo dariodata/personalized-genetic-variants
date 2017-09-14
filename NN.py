@@ -342,13 +342,13 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
         plt.plot(np.squeeze(costs))
         plt.ylabel('cost')
         plt.xlabel('iterations (per fives)')
-        plt.title("Learning rate = {0}, beta = {1}, test cost = {2}, test accuracy = {3}".format(str(learning_rate),
+        plt.title("Learning rate = {0}, beta = {1},\n test cost = {2}, test accuracy = {3}".format(str(learning_rate),
                                                                                                  str(beta),
                                                                                                  str(test_cost),
                                                                                                  str(test_accuracy)))
         dirname = 'output/'
-        filename = timestr + '_lr_' + str(learning_rate) + '_beta_' + str(beta) \
-                   + '_testcost_' + str(test_cost) + '_accuracy_' + str(test_accuracy) + '.png'
+        filename = timestr + '_lr_{}_beta_{}_testcost_{:.2f}_testacc_{:.2f}.png'.format(learning_rate, beta,
+                                                                                      test_cost, test_accuracy)
         plt.savefig(dirname + filename)
 
         return parameters
