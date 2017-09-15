@@ -17,6 +17,8 @@ Y_train_orig = np.load('output/encoded_y.npy')
 X_test = np.load('output/test_set.npy')
 test_index = np.load('output/test_index.npy')
 timestr = time.strftime("%Y%m%d-%H%M%S")
+dirname = 'output/'  # output directory
+filename = ''
 
 X_train, X_val, Y_train, Y_val = train_test_split(X_train_orig, Y_train_orig, test_size=0.20, random_state=42)
 X_train, X_val, Y_train, Y_val = X_train.T, X_val.T, Y_train.T, Y_val.T
@@ -317,10 +319,10 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
         plt.xlabel('iterations (per fives)')
         plt.title("Learning rate = {}, beta = {},\n"
                   "test cost = {:.6f}, test accuracy = {:.6f}".format(learning_rate, beta, test_cost, test_accuracy))
-        dirname = 'output/'
-        filename = timestr + '_NN4L_lr_{}_beta_{}_testcost_{:.2f}_testacc_{:.2f}.png'.format(learning_rate, beta,
-                                                                                        test_cost, test_accuracy)
-        plt.savefig(dirname + filename)
+        global filename
+        filename = timestr + '_NN4L_lr_{}_beta_{}_cost_{:.2f}-{:.2f}_acc_{:.2f}-{:.2f}'.format(
+            learning_rate, beta, train_cost, test_cost, train_accuracy, test_accuracy)
+        plt.savefig(dirname + filename + '.png')
 
         return parameters
 
@@ -331,4 +333,4 @@ prediction = predict(X_test, parameters)
 submission = pd.DataFrame(prediction.T)
 submission['id'] = test_index
 submission.columns = ['class1', 'class2', 'class3', 'class4', 'class5', 'class6', 'class7', 'class8', 'class9', 'id']
-submission.to_csv('output/' + timestr + '_submission.csv', index=False)
+submission.to_csv(dirname + filename + '.csv', index=False)
