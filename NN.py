@@ -18,7 +18,7 @@ X_test = np.load('output/test_set.npy')
 test_index = np.load('output/test_index.npy')
 timestr = time.strftime("%Y%m%d-%H%M%S")
 
-X_train, X_val, Y_train, Y_val = train_test_split(X_train_orig, Y_train_orig, test_size=0.20, random_state=42)
+X_train, X_val, Y_train, Y_val = train_test_split(X_train_orig, Y_train_orig, test_size=0.01, random_state=42)
 X_train, X_val, Y_train, Y_val = X_train.T, X_val.T, Y_train.T, Y_val.T
 X_test = X_test.T
 print('X_train: ', X_train.shape)
