@@ -18,7 +18,7 @@ X_test = np.load('output/test_set.npy')
 test_index = np.load('output/test_index.npy')
 timestr = time.strftime("%Y%m%d-%H%M%S")
 
-X_train, X_val, Y_train, Y_val = train_test_split(X_train_orig, Y_train_orig, test_size=0.01, random_state=42)
+X_train, X_val, Y_train, Y_val = train_test_split(X_train_orig, Y_train_orig, test_size=0.20, random_state=42)
 X_train, X_val, Y_train, Y_val = X_train.T, X_val.T, Y_train.T, Y_val.T
 X_test = X_test.T
 print('X_train: ', X_train.shape)
@@ -279,8 +279,7 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
                 (minibatch_X, minibatch_Y) = minibatch
 
                 # IMPORTANT: The line that runs the graph on a minibatch.
-                # Run the session to execute the "optimizer" and the "cost", the feedict should contain a minibatch for (X,Y)
-                # Enter the keep_probabilities for dropout at this point
+                # Run the session to execute the "optimizer" and the "cost"
                 _, minibatch_cost = sess.run([optimizer, cost], feed_dict={X: minibatch_X, Y: minibatch_Y,
                                                                            keep_prob1: 0.7, keep_prob2: 0.5})
                 epoch_cost += minibatch_cost / num_minibatches
