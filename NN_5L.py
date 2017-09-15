@@ -226,7 +226,7 @@ def predict(X, parameters):
 
 
 def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
-          num_epochs=2000, minibatch_size=64, print_cost=True):
+          num_epochs=10000, minibatch_size=64, print_cost=True):
     """
     Implements a four-layer tensorflow neural network: LINEAR->RELU->LINEAR->RELU->LINEAR->SOFTMAX.
 
