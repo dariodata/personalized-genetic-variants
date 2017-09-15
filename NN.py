@@ -32,16 +32,12 @@ def create_placeholders(n_x, n_y):
     Creates the placeholders for the tensorflow session.
 
     Arguments:
-    n_x -- scalar, size of an image vector (num_px * num_px = 64 * 64 * 3 = 12288)
-    n_y -- scalar, number of classes (from 0 to 5, so -> 6)
+    n_x -- scalar, dimensions of the input
+    n_y -- scalar, number of classes (from 0 to 8, so -> 9)
 
     Returns:
     X -- placeholder for the data input, of shape [n_x, None] and dtype "float"
     Y -- placeholder for the input labels, of shape [n_y, None] and dtype "float"
-
-    Tips:
-    - You will use None because it let's us be flexible on the number of examples you will for the placeholders.
-      In fact, the number of examples during test/train is different.
     """
 
     X = tf.placeholder(tf.float32, shape=(n_x, None), name='X')
@@ -55,7 +51,7 @@ def initialize_parameters():
     Initializes parameters to build a neural network with tensorflow.
 
     Returns:
-    parameters -- a dictionary of tensors containing W1, b1, W2, b2, W3, b3
+    parameters -- a dictionary of tensors containing W and b for every layer
     """
 
     tf.set_random_seed(1)
@@ -83,15 +79,15 @@ def initialize_parameters():
 
 def forward_propagation(X, parameters, keep_prob1, keep_prob2):
     """
-    Implements the forward propagation for the model: LINEAR -> RELU -> LINEAR -> RELU -> LINEAR -> SOFTMAX
+    Implements the forward propagation for the model: (LINEAR -> RELU)^3 -> LINEAR -> SOFTMAX
 
     Arguments:
     X -- input dataset placeholder, of shape (input size, number of examples)
-    parameters -- python dictionary containing your parameters "W1", "b1", "W2", "b2", "W3", "b3"
+    parameters -- python dictionary containing your parameters "W" and "b" for every layer
                   the shapes are given in initialize_parameters
 
     Returns:
-    Z3 -- the output of the last LINEAR unit
+    Z4 -- the output of the last LINEAR unit (logits)
     """
 
     # Retrieve the parameters from the dictionary "parameters"
@@ -106,10 +102,10 @@ def forward_propagation(X, parameters, keep_prob1, keep_prob2):
 
     Z1 = tf.matmul(W1, X) + b1  # Z1 = np.dot(W1, X) + b1
     A1 = tf.nn.relu(Z1)  # A1 = relu(Z1)
-    A1 = tf.nn.dropout(A1, keep_prob1)
+    A1 = tf.nn.dropout(A1, keep_prob1) # add dropout
     Z2 = tf.matmul(W2, A1) + b2  # Z2 = np.dot(W2, a1) + b2
     A2 = tf.nn.relu(Z2)  # A2 = relu(Z2)
-    A2 = tf.nn.dropout(A2, keep_prob2)
+    A2 = tf.nn.dropout(A2, keep_prob2) # add dropout
     Z3 = tf.matmul(W3, A2) + b3  # Z3 = np.dot(W3,Z2) + b3
     A3 = tf.nn.relu(Z3)
     Z4 = tf.matmul(W4, A3) + b4
@@ -122,14 +118,14 @@ def compute_cost(Z4, Y):
     Computes the cost
 
     Arguments:
-    Z4 -- output of forward propagation (output of the last LINEAR unit), of shape (6, number of examples)
-    Y -- "true" labels vector placeholder, same shape as Z3
+    Z4 -- output of forward propagation (output of the last LINEAR unit), of shape (n_classes, number of examples)
+    Y -- "true" labels vector placeholder, same shape as Z4
 
     Returns:
     cost - Tensor of the cost function
     """
 
-    # to fit the tensorflow requirement for tf.nn.softmax_cross_entropy_with_logits(...,...)
+    # transpose to fit the tensorflow requirement for tf.nn.softmax_cross_entropy_with_logits(...,...)
     logits = tf.transpose(Z4)
     labels = tf.transpose(Y)
 
@@ -138,13 +134,13 @@ def compute_cost(Z4, Y):
     return cost
 
 
-def random_mini_batches(X, Y, mini_batch_size=32, seed=0):
+def random_mini_batches(X, Y, mini_batch_size, seed=0):
     """
     Creates a list of random minibatches from (X, Y)
 
     Arguments:
     X -- input data, of shape (input size, number of examples)
-    Y -- true "label" vector (containing 0 if cat, 1 if non-cat), of shape (1, number of examples)
+    Y -- true "label" vector, of shape (1, number of examples)
     mini_batch_size - size of the mini-batches, integer
     seed
 
@@ -163,7 +159,7 @@ def random_mini_batches(X, Y, mini_batch_size=32, seed=0):
 
     # Step 2: Partition (shuffled_X, shuffled_Y). Minus the end case.
     num_complete_minibatches = math.floor(
-        m / mini_batch_size)  # number of mini batches of size mini_batch_size in your partitionning
+        m / mini_batch_size)  # number of mini batches of size mini_batch_size in your partitioning
     for k in range(0, num_complete_minibatches):
         mini_batch_X = shuffled_X[:, k * mini_batch_size: k * mini_batch_size + mini_batch_size]
         mini_batch_Y = shuffled_Y[:, k * mini_batch_size: k * mini_batch_size + mini_batch_size]
@@ -216,13 +212,13 @@ def predict(X, parameters):
 def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
           num_epochs=1000, minibatch_size=64, print_cost=True):
     """
-    Implements a four-layer tensorflow neural network: LINEAR->RELU->LINEAR->RELU->LINEAR->SOFTMAX.
+    Implements a four-layer tensorflow neural network: (LINEAR->RELU)^3->LINEAR->SOFTMAX.
 
     Arguments:
-    X_train -- training set, of shape (input size = 12288, number of training examples = 1080)
-    Y_train -- test set, of shape (output size = 6, number of training examples = 1080)
-    X_test -- training set, of shape (input size = 12288, number of training examples = 120)
-    Y_test -- test set, of shape (output size = 6, number of test examples = 120)
+    X_train -- training set, of shape (input size, number of training examples)
+    Y_train -- test set, of shape (output size, number of training examples)
+    X_test -- training set, of shape (input size, number of training examples)
+    Y_test -- test set, of shape (output size, number of test examples)
     learning_rate -- learning rate of the optimization
     num_epochs -- number of epochs of the optimization loop
     minibatch_size -- size of a minibatch
@@ -238,27 +234,27 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
     (n_x, m) = X_train.shape  # (n_x: input size, m : number of examples in the train set)
     n_y = Y_train.shape[0]  # n_y : output size
     costs = []  # To keep track of the cost
-    t0 = time.time()
+    t0 = time.time()  # to mark the start of the training
 
     # Create Placeholders of shape (n_x, n_y)
     X, Y = create_placeholders(n_x, n_y)
-    keep_prob1 = tf.placeholder(tf.float32, name='keep_prob1')
+    keep_prob1 = tf.placeholder(tf.float32, name='keep_prob1')  # probability to keep a unit during dropout
     keep_prob2 = tf.placeholder(tf.float32, name='keep_prob2')
 
     # Initialize parameters
     parameters = initialize_parameters()
 
-    # Forward propagation: Build the forward propagation in the tensorflow graph
+    # Forward propagation
     Z4 = forward_propagation(X, parameters, keep_prob1, keep_prob2)
 
-    # Cost function: Add cost function to tensorflow graph
+    # Cost function
     cost = compute_cost(Z4, Y)
     regularizers = tf.nn.l2_loss(parameters['W1']) + tf.nn.l2_loss(parameters['W2']) + tf.nn.l2_loss(parameters['W3']) \
                    + tf.nn.l2_loss(parameters['W4']) # add regularization term
     beta = 0.05 # regularization constant
     cost = tf.reduce_mean(cost + beta*regularizers) # cost with regularization
 
-    # Backpropagation: Define the tensorflow optimizer. Use an AdamOptimizer.
+    # Backpropagation: Define the tensorflow AdamOptimizer.
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
 
     # Initialize all the variables
