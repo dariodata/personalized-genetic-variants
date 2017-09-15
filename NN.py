@@ -12,10 +12,10 @@ from sklearn.model_selection import train_test_split
 np.random.seed(1)
 
 # load the data
-X_train_orig = np.load('output/train_set.npy')
-Y_train_orig = np.load('output/encoded_y.npy')
-X_test = np.load('output/test_set.npy')
-test_index = np.load('output/test_index.npy')
+X_train_orig = np.load('input/train_set.npy')
+Y_train_orig = np.load('input/encoded_y.npy')
+X_test = np.load('input/test_set.npy')
+test_index = np.load('input/test_index.npy')
 timestr = time.strftime("%Y%m%d-%H%M%S")
 dirname = 'output/'  # output directory
 filename = ''
