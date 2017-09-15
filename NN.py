@@ -279,14 +279,15 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
                 (minibatch_X, minibatch_Y) = minibatch
 
                 # IMPORTANT: The line that runs the graph on a minibatch.
-                # Run the session to execute the "optimizer" and the "cost", the feedict should contain a minibatch for (X,Y).
+                # Run the session to execute the "optimizer" and the "cost", the feedict should contain a minibatch for (X,Y)
+                # Enter the keep_probabilities for dropout at this point
                 _, minibatch_cost = sess.run([optimizer, cost], feed_dict={X: minibatch_X, Y: minibatch_Y,
                                                                            keep_prob1: 0.7, keep_prob2: 0.5})
                 epoch_cost += minibatch_cost / num_minibatches
 
             # Print the cost every epoch
             if print_cost == True and epoch % 100 == 0:
-                print("Cost after epoch %i: %f" % (epoch, epoch_cost))
+                print("Cost after epoch {}: {:f}".format(epoch, epoch_cost))
             if print_cost == True and epoch % 5 == 0:
                 costs.append(epoch_cost)
 
