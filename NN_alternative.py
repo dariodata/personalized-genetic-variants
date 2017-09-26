@@ -253,7 +253,7 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
     cost = compute_cost(Z4, Y)
     regularizers = tf.nn.l2_loss(parameters['W1']) + tf.nn.l2_loss(parameters['W2']) + tf.nn.l2_loss(parameters['W3']) \
                    + tf.nn.l2_loss(parameters['W4']) # add regularization term
-    beta = 0.05 # regularization constant
+    beta = 0.1 # regularization constant
     cost = tf.reduce_mean(cost + beta*regularizers) # cost with regularization
 
     # Backpropagation: Define the tensorflow AdamOptimizer.
