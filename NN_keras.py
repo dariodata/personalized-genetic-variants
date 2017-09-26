@@ -11,7 +11,8 @@ from sklearn.model_selection import train_test_split
 
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, LSTM, Embedding, Input, RepeatVector
-from keras.optimizers import SGD
+from keras.optimizers import SGD, Adam
+from keras.initializers import Zeros, glorot_normal
 from keras import regularizers
 
 np.random.seed(1)
@@ -32,24 +33,56 @@ print('Y_train: ', Y_train.shape)
 input_dim = 350
 n_1 = input_dim
 n_2 = 350
-n_3 = 300
-n_4 = 30
+n_3 = 100
+n_4 = 100
+n_5 = 100
 n_L = 9
-
+beta = 0.05
 
 def baseline_model():
     model = Sequential()
-    model.add(Dense(n_1, input_dim=input_dim, init='normal', activation='relu', kernel_regularizer=regularizers.l2(0.1)))
+    model.add(Dense(n_1, input_dim=input_dim,
+                    activation='relu',
+                    kernel_initializer=glorot_normal(seed=1),
+                    bias_initializer=Zeros(),
+                    kernel_regularizer=regularizers.l2(beta)
+                    ))
     model.add(Dropout(0.3))
-    model.add(Dense(n_2, init='normal', activation='relu', kernel_regularizer=regularizers.l2(0.1)))
+    model.add(Dense(n_2,
+                    activation='relu',
+                    kernel_initializer=glorot_normal(seed=1),
+                    bias_initializer=Zeros(),
+                    kernel_regularizer=regularizers.l2(beta)
+                    ))
     model.add(Dropout(0.5))
-    model.add(Dense(n_3, init='normal', activation='relu', kernel_regularizer=regularizers.l2(0.1)))
-    model.add(Dropout(0.5))
-    model.add(Dense(n_4, init='normal', activation='relu', kernel_regularizer=regularizers.l2(0.1)))
-    model.add(Dense(n_L, init='normal', activation="softmax", kernel_regularizer=regularizers.l2(0.1)))
+    model.add(Dense(n_3,
+                    activation='relu',
+                    kernel_initializer=glorot_normal(seed=1),
+                    bias_initializer=Zeros(),
+                    kernel_regularizer=regularizers.l2(beta)
+                    ))
+    # model.add(Dense(n_4,
+    #                 activation='relu',
+    #                 kernel_initializer=glorot_normal(seed=1),
+    #                 bias_initializer=Zeros(),
+    #                 kernel_regularizer=regularizers.l2(beta)
+    #                 ))
+    # model.add(Dense(n_5,
+    #                 activation='relu',
+    #                 kernel_initializer=glorot_normal(seed=1),
+    #                 bias_initializer=Zeros(),
+    #                 kernel_regularizer=regularizers.l2(beta)
+    #                 ))
+    model.add(Dense(n_L,
+                    activation='softmax',
+                    kernel_initializer=glorot_normal(seed=1),
+                    bias_initializer=Zeros(),
+                    kernel_regularizer=regularizers.l2(beta)
+                    ))
 
-    sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
-    model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
+    #sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+    adam = Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+    model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['accuracy'])
     return model
 
 
@@ -72,7 +105,7 @@ plt.ylabel('accuracy')
 plt.xlabel('epoch')
 plt.legend(['train', 'valid'], loc='upper left')
 plt.savefig(dirname + filename + '_ACC.png')
-plt.show()
+plt.close()
 
 # summarize history for loss
 plt.plot(estimator.history['loss'])
@@ -82,8 +115,7 @@ plt.ylabel('loss')
 plt.xlabel('epoch')
 plt.legend(['train', 'valid'], loc='upper left')
 plt.savefig(dirname + filename + '_COST.png')
-plt.show()
-
+plt.close()
 
 prediction = model.predict_proba(X_test)
 submission = pd.DataFrame(prediction)
