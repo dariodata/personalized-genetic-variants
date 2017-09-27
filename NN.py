@@ -12,10 +12,10 @@ from sklearn.model_selection import train_test_split
 np.random.seed(1)
 
 # load the data
-X_train_orig = np.load('input/train_set.npy')
-Y_train_orig = np.load('input/encoded_y.npy')
-X_test = np.load('input/test_set.npy')
-test_index = np.load('input/test_index.npy')
+X_train_orig = np.load('input/stage2_train_set.npy')
+Y_train_orig = np.load('input/stage2_encoded_y.npy')
+X_test = np.load('input/stage2_test_set.npy')
+test_index = np.load('input/stage2_test_index.npy')
 timestr = time.strftime("%Y%m%d-%H%M%S")
 dirname = 'output/'  # output directory
 filename = ''
@@ -253,7 +253,7 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
     cost = compute_cost(Z4, Y)
     regularizers = tf.nn.l2_loss(parameters['W1']) + tf.nn.l2_loss(parameters['W2']) + tf.nn.l2_loss(parameters['W3']) \
                    + tf.nn.l2_loss(parameters['W4']) # add regularization term
-    beta = 0.05 # regularization constant
+    beta = 0.01 # regularization constant
     cost = tf.reduce_mean(cost + beta*regularizers) # cost with regularization
 
     # Backpropagation: Define the tensorflow AdamOptimizer.
@@ -320,7 +320,7 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
         plt.title("Learning rate = {}, beta = {},\n"
                   "test cost = {:.6f}, test accuracy = {:.6f}".format(learning_rate, beta, test_cost, test_accuracy))
         global filename
-        filename = timestr + '_NN4L_lr_{}_beta_{}_cost_{:.2f}-{:.2f}_acc_{:.2f}-{:.2f}'.format(
+        filename = timestr + '_NN4Lstage2_lr_{}_beta_{}_cost_{:.2f}-{:.2f}_acc_{:.2f}-{:.2f}'.format(
             learning_rate, beta, train_cost, test_cost, train_accuracy, test_accuracy)
         plt.savefig(dirname + filename + '.png')
 
