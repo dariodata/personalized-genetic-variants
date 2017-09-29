@@ -9,7 +9,7 @@ import time
 from tensorflow.python.framework import ops
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import KFold
-from sklearn.metrics import mean_absolute_error
+from sklearn.metrics import mean_absolute_error, log_loss
 
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, LSTM, Embedding, Input, RepeatVector
@@ -150,11 +150,11 @@ for (inTr, inTe) in folds.split(X_train, Y_train):
         pred_test += model.predict_generator(generator = batch_generatorp(X_test, batch_sizep, False), steps = X_test.shape[0]/batch_sizep)[:,:]
     pred /= nbags
     pred_oob[inTe] = pred
-    #score = mean_absolute_error(yte, pred)
+    score = log_loss(yte, pred)
     i += 1
-    print('Fold ', i, '- MAE:')#, score)
+    print('Fold ', i, '- log_loss:', score)
 
-#print('Total - MAE:', mean_absolute_error(Y_train, pred_oob))
+print('Total - log_loss:', log_loss(Y_train, pred_oob))
 
 ## test predictions
 pred_test /= (nfolds*nbags)
