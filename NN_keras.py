@@ -18,10 +18,10 @@ from keras import regularizers
 np.random.seed(1)
 
 # load the data
-X_train = np.load('input/train_set.npy')
-Y_train = np.load('input/encoded_y.npy')
-X_test = np.load('input/test_set.npy')
-test_index = np.load('input/test_index.npy')
+X_train = np.load('input/stage2_train_set.npy')
+Y_train = np.load('input/stage2_encoded_y.npy')
+X_test = np.load('input/stage2_test_set.npy')
+test_index = np.load('input/stage2_test_index.npy')
 timestr = time.strftime("%Y%m%d-%H%M%S")
 dirname = 'output/'  # output directory
 filename = ''
@@ -81,7 +81,7 @@ def baseline_model():
                     ))
 
     #sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
-    adam = Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+    adam = Adam(lr=0.0001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
     model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['accuracy'])
     return model
 
@@ -93,7 +93,7 @@ estimator=model.fit(X_train, Y_train, validation_split=0.2, epochs=100, batch_si
 
 print("Training accuracy: %.2f%% / Validation accuracy: %.2f%%" % (100*estimator.history['acc'][-1], 100*estimator.history['val_acc'][-1]))
 
-filename = timestr + '_cost_{:.2f}-{:.2f}_acc_{:.2f}-{:.2f}'.format(
+filename = timestr + '_NNkeras2stage_cost_{:.2f}-{:.2f}_acc_{:.2f}-{:.2f}'.format(
     estimator.history['loss'][-1], estimator.history['val_loss'][-1],
     estimator.history['acc'][-1], estimator.history['val_acc'][-1])
 
