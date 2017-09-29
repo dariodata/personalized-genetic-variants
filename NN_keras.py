@@ -80,9 +80,9 @@ def baseline_model():
                     kernel_regularizer=regularizers.l2(beta)
                     ))
 
-    #sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
-    adam = Adam(lr=0.0001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
-    model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['accuracy'])
+    sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+    #adam = Adam(lr=0.0001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+    model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
     return model
 
 
