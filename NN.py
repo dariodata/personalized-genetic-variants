@@ -19,9 +19,14 @@ timestr = time.strftime("%Y%m%d-%H%M%S")
 dirname = 'output/'  # output directory
 filename = ''
 
+# split data into training and validation sets
 X_train, X_val, Y_train, Y_val = train_test_split(X_train_orig, Y_train_orig, test_size=0.20, random_state=42)
 X_train, X_val, Y_train, Y_val = X_train.T, X_val.T, Y_train.T, Y_val.T
+
+# transpose test set
 X_test = X_test.T
+
+# view data set shapes
 print('X_train: ', X_train.shape)
 print('X_val: ', X_val.shape)
 print('Y_train: ', Y_train.shape)
@@ -325,9 +330,13 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
         return parameters
 
 
+# train the model and get learned parameters
 parameters = model(X_train, Y_train, X_val, Y_val)
 
+# use learned parameters to make prediction on test data
 prediction = predict(X_test, parameters)
+
+# create submission file
 submission = pd.DataFrame(prediction.T)
 submission['id'] = test_index
 submission.columns = ['class1', 'class2', 'class3', 'class4', 'class5', 'class6', 'class7', 'class8', 'class9', 'id']
