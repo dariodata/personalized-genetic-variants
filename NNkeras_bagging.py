@@ -142,12 +142,18 @@ for (inTr, inTe) in folds.split(X_train, Y_train):
     pred = np.zeros((yte.shape[0], yte.shape[1]))
     for j in range(nbags):
         model = baseline_model()
-        fit = model.fit_generator(generator = batch_generator(xtr, ytr, batch_size, True),
-                                  steps_per_epoch= xtr.shape[0]/batch_size,
-                                  epochs = nepochs,
-                                  verbose = 0)
-        pred += model.predict_generator(generator = batch_generatorp(xte, batch_sizep, False), steps = xte.shape[0]/batch_sizep)[:,:]
-        pred_test += model.predict_generator(generator = batch_generatorp(X_test, batch_sizep, False), steps = X_test.shape[0]/batch_sizep)[:,:]
+        fit = model.fit(xtr, ytr, verbose=2, epochs=10)
+        pred += model.predict(xte)
+        pred_test += model.predict(X_test)
+        # Using generator
+        # fit = model.fit_generator(generator=batch_generator(xtr, ytr, batch_size, True),
+        #                           steps_per_epoch=xtr.shape[0] / batch_size,
+        #                           epochs=nepochs,
+        #                           verbose=0)
+        # pred += model.predict_generator(generator=batch_generatorp(xte, batch_sizep, False),
+        #                                 steps=xte.shape[0] / batch_sizep)[:, :]
+        # pred_test += model.predict_generator(generator=batch_generatorp(X_test, batch_sizep, False),
+        #                                      steps=X_test.shape[0] / batch_sizep)[:, :]
     pred /= nbags
     pred_oob[inTe] = pred
     score = log_loss(yte, pred)
@@ -162,6 +168,12 @@ submission = pd.DataFrame(pred_test)
 submission['id'] = test_index
 submission.columns = ['class1', 'class2', 'class3', 'class4', 'class5', 'class6', 'class7', 'class8', 'class9', 'id']
 submission.to_csv(dirname + timestr + filename + 'kerasbagging.csv', index=False)
+
+## oob predictions
+oob_prediction = pd.DataFrame(pred_oob)
+#oob_prediction['id'] = test_index
+oob_prediction.columns = ['class1', 'class2', 'class3', 'class4', 'class5', 'class6', 'class7', 'class8', 'class9']
+oob_prediction.to_csv(dirname + timestr + filename + 'kerasbagging_oob_pred.csv', index=False)
 
 #estimator=model.fit(X_train, Y_train, validation_split=0.2, epochs=100, batch_size=64, verbose=2)
 
