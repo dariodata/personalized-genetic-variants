@@ -284,7 +284,6 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
                 # Select a minibatch
                 (minibatch_X, minibatch_Y) = minibatch
 
-                # IMPORTANT: The line that runs the graph on a minibatch.
                 # Run the session to execute the "optimizer" and the "cost"
                 _, minibatch_cost = sess.run([optimizer, cost], feed_dict={X: minibatch_X, Y: minibatch_Y,
                                                                            keep_prob1: 0.7, keep_prob2: 0.5})
