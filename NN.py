@@ -1,13 +1,12 @@
 import math
-import numpy as np
-import h5py
-import matplotlib.pyplot as plt
-import pandas as pd
-import tensorflow as tf
 import time
 
-from tensorflow.python.framework import ops
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import tensorflow as tf
 from sklearn.model_selection import train_test_split
+from tensorflow.python.framework import ops
 
 np.random.seed(1)
 
@@ -104,10 +103,10 @@ def forward_propagation(X, parameters, keep_prob1, keep_prob2):
 
     Z1 = tf.matmul(W1, X) + b1  # Z1 = np.dot(W1, X) + b1
     A1 = tf.nn.relu(Z1)  # A1 = relu(Z1)
-    A1 = tf.nn.dropout(A1, keep_prob1) # add dropout
+    A1 = tf.nn.dropout(A1, keep_prob1)  # add dropout
     Z2 = tf.matmul(W2, A1) + b2  # Z2 = np.dot(W2, a1) + b2
     A2 = tf.nn.relu(Z2)  # A2 = relu(Z2)
-    A2 = tf.nn.dropout(A2, keep_prob2) # add dropout
+    A2 = tf.nn.dropout(A2, keep_prob2)  # add dropout
     Z3 = tf.matmul(W3, A2) + b3  # Z3 = np.dot(W3,Z2) + b3
     A3 = tf.nn.relu(Z3)
     Z4 = tf.matmul(W4, A3) + b4
@@ -202,11 +201,11 @@ def predict(X, parameters):
     keep_prob2 = tf.placeholder(tf.float32, name='keep_prob2')
 
     z4 = forward_propagation(x, params, keep_prob1, keep_prob2)
-    p = tf.nn.softmax(z4, dim=0) # dim=0 because the classes are on that axis
+    p = tf.nn.softmax(z4, dim=0)  # dim=0 because the classes are on that axis
     # p = tf.argmax(z4) # this gives only the predicted class as output
 
     sess = tf.Session()
-    prediction = sess.run(p, feed_dict={x: X, keep_prob1:1.0, keep_prob2:1.0})
+    prediction = sess.run(p, feed_dict={x: X, keep_prob1: 1.0, keep_prob2: 1.0})
 
     return prediction
 
@@ -252,9 +251,9 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
     # Cost function
     cost = compute_cost(Z4, Y)
     regularizers = tf.nn.l2_loss(parameters['W1']) + tf.nn.l2_loss(parameters['W2']) + tf.nn.l2_loss(parameters['W3']) \
-                   + tf.nn.l2_loss(parameters['W4']) # add regularization term
-    beta = 0.01 # regularization constant
-    cost = tf.reduce_mean(cost + beta*regularizers) # cost with regularization
+                   + tf.nn.l2_loss(parameters['W4'])  # add regularization term
+    beta = 0.01  # regularization constant
+    cost = tf.reduce_mean(cost + beta * regularizers)  # cost with regularization
 
     # Backpropagation: Define the tensorflow AdamOptimizer.
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
@@ -292,7 +291,6 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
             if print_cost == True and epoch % 5 == 0:
                 costs.append(epoch_cost)
 
-
         # lets save the parameters in a variable
         parameters = sess.run(parameters)
         print("Parameters have been trained!")
@@ -302,10 +300,10 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.0001,
         # Calculate accuracy on the test set
         accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
 
-        train_cost = cost.eval({X: X_train, Y: Y_train, keep_prob1:1.0, keep_prob2:1.0})
-        test_cost = cost.eval({X: X_test, Y: Y_test, keep_prob1:1.0, keep_prob2:1.0})
-        train_accuracy = accuracy.eval({X: X_train, Y: Y_train, keep_prob1:1.0, keep_prob2:1.0})
-        test_accuracy = accuracy.eval({X: X_test, Y: Y_test, keep_prob1:1.0, keep_prob2:1.0})
+        train_cost = cost.eval({X: X_train, Y: Y_train, keep_prob1: 1.0, keep_prob2: 1.0})
+        test_cost = cost.eval({X: X_test, Y: Y_test, keep_prob1: 1.0, keep_prob2: 1.0})
+        train_accuracy = accuracy.eval({X: X_train, Y: Y_train, keep_prob1: 1.0, keep_prob2: 1.0})
+        test_accuracy = accuracy.eval({X: X_test, Y: Y_test, keep_prob1: 1.0, keep_prob2: 1.0})
 
         print('Finished training in %s s' % (time.time() - t0))
         print("Train Cost:", train_cost)
