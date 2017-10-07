@@ -7,11 +7,11 @@ import xgboost as xgb
 np.random.seed(1)
 
 # load the data
-X_train_orig = np.load('input/train_set.npy')
-Y_train_orig = np.load('input/encoded_y.npy')
+X_train_orig = np.load('input/stage2_train_set.npy')
+Y_train_orig = np.load('input/stage2_encoded_y.npy')
 Y_train_orig = np.argmax(Y_train_orig, axis=1) # xgboost needs the classes labeled as int from 0 to num_classes
-X_test = np.load('input/test_set.npy')
-test_index = np.load('input/test_index.npy')
+X_test = np.load('input/stage2_test_set.npy')
+test_index = np.load('input/stage2_test_index.npy')
 timestr = time.strftime("%Y%m%d-%H%M%S")
 dirname = 'output/'  # output directory
 filename = ''
@@ -60,7 +60,7 @@ def run_xgb(dtrain, dtest=None, params=params, cv=False):
 
         # name file
         filename = timestr + \
-                   '_XGB_eta_{}_depth_{}_childw_{}_sample_{}_rounds_{}'.format(
+                   '_XGB2ndstage_eta_{}_depth_{}_childw_{}_sample_{}_rounds_{}'.format(
                        params['eta'], params['max_depth'], params['min_child_weight'], params['subsample'],
                        num_boost_rounds)
 
@@ -91,7 +91,8 @@ def run_xgb(dtrain, dtest=None, params=params, cv=False):
 
         # name file
         filename = timestr + \
-                   '_XGB_eta_{}_depth_{}_childw_{}_sample_{}_rounds_{}_cost_{:.2f}-{:.2f}_acc_{:.2f}-{:.2f}'.format(
+                   '_XGB2ndstage_eta_{}_depth_{}_childw_{}_sample_{}_rounds_{}_cost_{:.2f}-{:.2f}_acc_{:.2f}-{' \
+                   ':.2f}'.format(
                        params['eta'], params['max_depth'], params['min_child_weight'], params['subsample'],
                        num_boost_rounds, train_cost, test_cost, train_accuracy, test_accuracy)
 
